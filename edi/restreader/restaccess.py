@@ -7,6 +7,9 @@ import json
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from zope.schema.interfaces import IContextSourceBinder
 from zope.interface import directlyProvides
+from plone.memoize import ram
+from time import time
+from plone import api as ploneapi
 
 login = {'login': 'restaccess', 'password': 'H9jCg768'}
 authurl = u'http://emissionsarme-produkte.bgetem.de/@login'
@@ -26,9 +29,10 @@ def getCatalogData(query):
     results = requests.get(searchurl, headers=headers, params=query)
     return results.json().get('items')
 
+@ram.cache(lambda *args: time() // (60 * 60))
 def possibleGefahrstoffe(context):
     terms = []
-    terms.append(SimpleVocabulary.createTerm(u'auswahl', u'auswahl', u'bitte auswählen'))
+    #terms.append(SimpleVocabulary.createTerm(u'auswahl', u'auswahl', u'bitte auswählen'))
     payload = {'portal_type': 'nva.chemiedp.produktdatenblatt',
            'b_size': 500,
            'sort_on': 'sortable_title',
@@ -39,14 +43,28 @@ def possibleGefahrstoffe(context):
     return SimpleVocabulary(terms)
 directlyProvides(possibleGefahrstoffe, IContextSourceBinder)
 
-def externalGefahrstoffList():
-    terms = []
-    terms.append(SimpleVocabulary.createTerm(u'auswahl', u'auswahl', u'bitte auswählen'))
+def getExternalGefahrstoffe():
     payload = {'portal_type': 'nva.chemiedp.produktdatenblatt',
            'b_size': 500,
            'sort_on': 'sortable_title',
            'metadata_fields':'UID'}
     entries = getCatalogData(payload)
+    return entries
+
+def externalGefahrstoffList():
+    terms = []
+    entries = getExternalGefahrstoffe()
     for i in entries:
-        terms.append(SimpleVocabulary.createTerm(i.get('@id'), i.get('UID'), i.get('title')))
+        clearid = i.get('@id').split('/')[-1]
+        #if ploneapi.content.find(portal_type='Schutzhandschuh', Gefahrstoffe=i.get('@id')):
+        terms.append(SimpleVocabulary.createTerm(i.get('@id'), clearid, i.get('title')))
     return terms
+
+def getExternalGefahrstoff(url):
+    token = getAuthToken()
+    headers = {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer %s' % token,
+        }
+    result = requests.get(url, headers=headers)
+    return result.json() 
