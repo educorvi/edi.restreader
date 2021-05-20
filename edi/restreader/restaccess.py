@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import requests
+import psycopg2
 import json
 from time import time
 
@@ -40,15 +41,25 @@ def getHersteller():
     return entries
 
 if __name__ == "__main__":
-    #conn = psycopg.connect("dbname=test user=postgres")
-    #cur = conn.cursor()
+    hostname = 'localhost'
+    username = 'seppowalther'
+    database = 'gefahrstoff'
+
     erg = getHersteller()
-    print(erg)
-    #for i in erg:
-    #    hersteller_title = i.title
-    #    hersteller_desc = i.description
+    conn = psycopg2.connect(host = hostname, user=username, dbname=database)
+    for i in erg:
+        hersteller_title = i.get('title')
+        hersteller_desc = i.get('description')
+        hersteller_uid = i.get('UID')
+        hersteller_link = i.get('@id')
+        cur = conn.cursor()
+        #cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
+        cur.execute("INSERT INTO manufacturer (title, description, webcode, manufacturer_image_id) VALUES (%s, %s, %s, NULL);", (hersteller_title, hersteller_desc, hersteller_uid))
+        conn.commit()
+        print(hersteller_title)# correct
+        cur.close()
+
     #    insert = "INSERT INTO manufacturer(title, description) (%s, %s)" % (hersteller_title, hersteller_desc)
     #    cur.execute(insert)
     #    cur.fetchall()
-
-    import pdb;pdb.set_trace()
+    conn.close()
