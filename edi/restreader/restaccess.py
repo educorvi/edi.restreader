@@ -56,6 +56,38 @@ def getPowders():
     entries = getCatalogData(payload)
     return entries
 
+def getEtiketten():
+    payload = {'portal_type': 'nva.chemiedp.reinigungsmitteletiketten',
+           'b_size': 500,
+           'sort_on': 'sortable_title',
+           'metadata_fields':'UID'}
+    entries = getCatalogData(payload)
+    return entries
+
+def getManuell():
+    payload = {'portal_type': 'nva.chemiedp.reinigungsmittelmanuell',
+           'b_size': 500,
+           'sort_on': 'sortable_title',
+           'metadata_fields':'UID'}
+    entries = getCatalogData(payload)
+    return entries
+
+def getProduktdatenblatt():
+    payload = {'portal_type': 'nva.chemiedp.produktdatenblatt',
+           'b_size': 500,
+           'sort_on': 'sortable_title',
+           'metadata_fields':'UID'}
+    entries = getCatalogData(payload)
+    return entries
+
+def getHeatset():
+    payload = {'portal_type': 'nva.chemiedp.heatsetwaschmittel',
+           'b_size': 500,
+           'sort_on': 'sortable_title',
+           'metadata_fields':'UID'}
+    entries = getCatalogData(payload)
+    return entries
+
 if __name__ == "__main__":
     hostname = 'localhost'
     username = 'postgres'
@@ -64,6 +96,10 @@ if __name__ == "__main__":
     erg = getHersteller()
     erg2 = getMachines()
     erg3 = getPowders()
+    erg4 = getEtiketten()
+    erg5 = getManuell()
+    erg6 = getProduktdatenblatt()
+    erg7 = getHeatset()
     conn = psycopg2.connect(host = hostname, user=username, dbname=database)
     #"""
     for i in erg:
@@ -103,6 +139,32 @@ if __name__ == "__main__":
                     (powder_title, powder_desc, powder_uid))
         conn.commit()
         print(powder_title)  # correct
+        cur.close()
+
+    for i in erg4:
+        etikett_title = i.get('title')
+        etikett_desc = i.get('description')
+        etikett_uid = i.get('UID')
+        etikett_link = i.get('@id')
+        cur = conn.cursor()
+        # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
+        cur.execute("INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url) VALUES (%s, %s, %s, 'detergent_labels', NULL);",
+                    (etikett_title, etikett_desc, etikett_uid))
+        conn.commit()
+        print(etikett_title)  # correct
+        cur.close()
+
+    for i in erg5:
+        manuell_title = i.get('title')
+        manuell_desc = i.get('description')
+        etikett_uid = i.get('UID')
+        etikett_link = i.get('@id')
+        cur = conn.cursor()
+        # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
+        cur.execute("INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url) VALUES (%s, %s, %s, 'detergent_labels', NULL);",
+                    (etikett_title, etikett_desc, etikett_uid))
+        conn.commit()
+        print(etikett_title)  # correct
         cur.close()
 
 
