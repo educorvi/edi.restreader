@@ -101,7 +101,7 @@ if __name__ == "__main__":
     erg6 = getProduktdatenblatt()
     erg7 = getHeatset()
     conn = psycopg2.connect(host = hostname, user=username, dbname=database)
-    #"""
+
     for i in erg:
         hersteller_title = i.get('title')
         hersteller_desc = i.get('description')
@@ -113,7 +113,6 @@ if __name__ == "__main__":
         conn.commit()
         print(hersteller_title)# correct
         cur.close()
-    #"""
 
     for i in erg2:
         machine_title = i.get('title')
@@ -153,20 +152,47 @@ if __name__ == "__main__":
         conn.commit()
         print(etikett_title)  # correct
         cur.close()
-
+        
     for i in erg5:
         manuell_title = i.get('title')
         manuell_desc = i.get('description')
-        etikett_uid = i.get('UID')
-        etikett_link = i.get('@id')
+        manuell_uid = i.get('UID')
+        manuell_link = i.get('@id')
         cur = conn.cursor()
         # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
-        cur.execute("INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url) VALUES (%s, %s, %s, 'detergent_labels', NULL);",
-                    (etikett_title, etikett_desc, etikett_uid))
+        cur.execute("INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url) VALUES (%s, %s, %s, 'detergent_manual', NULL);",
+                    (manuell_title, manuell_desc, manuell_uid))
         conn.commit()
-        print(etikett_title)  # correct
+        print(manuell_title)  # correct
+        cur.close()
+    
+    for i in erg6:
+        datenblatt_title = i.get('title')
+        datenblatt_desc = i.get('description')
+        datenblatt_uid = i.get('UID')
+        datenblatt_link = i.get('@id')
+        cur = conn.cursor()
+        # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
+        cur.execute(
+            "INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url) VALUES (%s, %s, %s, 'product_datasheet', NULL);",
+            (datenblatt_title, datenblatt_desc, datenblatt_uid))
+        conn.commit()
+        print(datenblatt_title)  # correct
         cur.close()
 
+    for i in erg7:
+        heatset_title = i.get('title')
+        heatset_desc = i.get('description')
+        heatset_uid = i.get('UID')
+        heatset_link = i.get('@id')
+        cur = conn.cursor()
+        # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
+        cur.execute(
+            "INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url) VALUES (%s, %s, %s, 'detergent_heatset', NULL);",
+            (heatset_title, heatset_desc, heatset_uid))
+        conn.commit()
+        print(heatset_title)  # correct
+        cur.close()
 
     #    insert = "INSERT INTO manufacturer(title, description) (%s, %s)" % (hersteller_title, hersteller_desc)
     #    cur.execute(insert)
