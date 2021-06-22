@@ -22,6 +22,15 @@ def getCatalogData(query):
     results = requests.get(searchurl, headers=headers, params=query)
     return results.json().get('items')
 
+def getItemData(entry):
+    token = getAuthToken()
+    headers = {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer %s' % token,
+    }
+    results = requests.get(entry.get('@id'), headers=headers)
+    return results.json()
+
 def possibleGefahrstoffe():
     terms = []
     payload = {'portal_type': 'nva.chemiedp.produktdatenblatt',
@@ -38,6 +47,14 @@ def getHersteller():
            'sort_on': 'sortable_title',
            'metadata_fields':'UID'}
     entries = getCatalogData(payload)
+    newentries = list()
+    for i in entries:
+        data = getItemData(i)
+        newentries.append(data)
+        #import pdb;pdb.set_trace()
+    return newentries
+    #import pdb; pdb.set_trace()
+    # Link?
     return entries
 
 def getMachines():
@@ -46,7 +63,12 @@ def getMachines():
            'sort_on': 'sortable_title',
            'metadata_fields':'UID'}
     entries = getCatalogData(payload)
-    return entries
+    newentries = list()
+    for i in entries:
+        data = getItemData(i)
+        newentries.append(data)
+        #import pdb; pdb.set_trace()
+    return newentries
 
 def getPowders():
     payload = {'portal_type': 'nva.chemiedp.druckbestaeubungspuder',
@@ -107,13 +129,21 @@ if __name__ == "__main__":
         hersteller_desc = i.get('description')
         hersteller_uid = i.get('UID')
         hersteller_link = i.get('@id')
+        hersteller_address1 = i.get('anschrift1')
+        hersteller_address2 = i.get('anschrift2')
+        hersteller_address3 = i.get('anschrift3')
+        hersteller_country = i.get('land')
+        hersteller_phone = i.get('telefon')
+        hersteller_fax = i.get('telefax')
+        hersteller_email = i.get('email')
+        hersteller_homepage = i.get('homepage')
         cur = conn.cursor()
         #cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
-        cur.execute("INSERT INTO manufacturer (title, description, webcode, image_id) VALUES (%s, %s, %s, NULL);", (hersteller_title, hersteller_desc, hersteller_uid))
+        cur.execute("INSERT INTO manufacturer (title, description, webcode, image_id, address1, address2, address3, country, phone, fax, email, homepage) VALUES (%s, %s, %s, NULL, %s, %s, %s, %s, %s, %s, %s, %s);", (hersteller_title, hersteller_desc, hersteller_uid, hersteller_address1, hersteller_address2, hersteller_address3, hersteller_country, hersteller_phone, hersteller_fax, hersteller_email, hersteller_homepage))
         conn.commit()
         print(hersteller_title)# correct
         cur.close()
-
+    """
     for i in erg2:
         machine_title = i.get('title')
         machine_desc = i.get('description')
@@ -193,7 +223,7 @@ if __name__ == "__main__":
         conn.commit()
         print(heatset_title)  # correct
         cur.close()
-
+    """
     #    insert = "INSERT INTO manufacturer(title, description) (%s, %s)" % (hersteller_title, hersteller_desc)
     #    cur.execute(insert)
     #    cur.fetchall()
