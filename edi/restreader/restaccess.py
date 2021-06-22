@@ -53,8 +53,6 @@ def getHersteller():
         newentries.append(data)
         #import pdb;pdb.set_trace()
     return newentries
-    #import pdb; pdb.set_trace()
-    # Link?
     return entries
 
 def getMachines():
@@ -76,7 +74,12 @@ def getPowders():
            'sort_on': 'sortable_title',
            'metadata_fields':'UID'}
     entries = getCatalogData(payload)
-    return entries
+    newentries = list()
+    for i in entries:
+        data = getItemData(i)
+        newentries.append(data)
+        #import pdb; pdb.set_trace()
+    return newentries
 
 def getEtiketten():
     payload = {'portal_type': 'nva.chemiedp.reinigungsmitteletiketten',
@@ -143,7 +146,7 @@ if __name__ == "__main__":
         conn.commit()
         print(hersteller_title)# correct
         cur.close()
-    """
+
     for i in erg2:
         machine_title = i.get('title')
         machine_desc = i.get('description')
@@ -162,14 +165,21 @@ if __name__ == "__main__":
         powder_desc = i.get('description')
         powder_uid = i.get('UID')
         powder_link = i.get('@id')
+        powder_product_class = i.get('produktklasse')
+        powder_starting_material = i.get('ausgangsmaterial')
+        powder_median_value = i.get('medianwert')
+        powder_volume_share = i.get('volumenanteil')
+        powder_machinery = i.get('maschinen')
+        powder_checked_emissions = i.get('emissionsgeprueft')
+        powder_date_checked = i.get('pruefdateum')
         cur = conn.cursor()
         # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
-        cur.execute("INSERT INTO spray_powder (title, description, webcode, image_url) VALUES (%s, %s, %s, NULL);",
-                    (powder_title, powder_desc, powder_uid))
+        cur.execute("INSERT INTO spray_powder (title, description, webcode, image_url, product_class, starting_material, median_value, volume_share, machinery, checked_emissions, date_checked) VALUES (%s, %s, %s, NULL, %s, %s, %s, %s, %s, %s, %s);",
+                    (powder_title, powder_desc, powder_uid, powder_product_class, powder_starting_material, powder_median_value, powder_volume_share, powder_machinery, powder_checked_emissions, powder_date_checked))
         conn.commit()
         print(powder_title)  # correct
         cur.close()
-
+    """
     for i in erg4:
         etikett_title = i.get('title')
         etikett_desc = i.get('description')
