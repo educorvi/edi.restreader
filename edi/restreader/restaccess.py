@@ -87,7 +87,12 @@ def getEtiketten():
            'sort_on': 'sortable_title',
            'metadata_fields':'UID'}
     entries = getCatalogData(payload)
-    return entries
+    newentries = list()
+    for i in entries:
+        data = getItemData(i)
+        newentries.append(data)
+        #import pdb; pdb.set_trace()
+    return newentries
 
 def getManuell():
     payload = {'portal_type': 'nva.chemiedp.reinigungsmittelmanuell',
@@ -179,16 +184,22 @@ if __name__ == "__main__":
         conn.commit()
         print(powder_title)  # correct
         cur.close()
-    """
+
     for i in erg4:
         etikett_title = i.get('title')
         etikett_desc = i.get('description')
         etikett_uid = i.get('UID')
         etikett_link = i.get('@id')
+        etikett_skin_category = i.get('hskategorie')
+        etikett_checked_emissions = i.get('emissionsgeprueft')
+        etikett_flashpoint = i.get('flammpunkt')
+        etikett_values_range = i.get('wertebereich')
+        etikett_classifications = i.get('einstufungen')
+        etikett_usecases = i.get('verwendungszweck')
         cur = conn.cursor()
         # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
-        cur.execute("INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url) VALUES (%s, %s, %s, 'detergent_labels', NULL);",
-                    (etikett_title, etikett_desc, etikett_uid))
+        cur.execute("INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url, skin_category, checked_emissions, flashpoint, values_range, classifications, usecases) VALUES (%s, %s, %s, 'detergent_labels', NULL, %s, %s, %s, %s, %s, %s);",
+                    (etikett_title, etikett_desc, etikett_uid, etikett_skin_category, etikett_checked_emissions, etikett_flashpoint, etikett_values_range, etikett_classifications, etikett_usecases))
         conn.commit()
         print(etikett_title)  # correct
         cur.close()
@@ -233,7 +244,7 @@ if __name__ == "__main__":
         conn.commit()
         print(heatset_title)  # correct
         cur.close()
-    """
+
     #    insert = "INSERT INTO manufacturer(title, description) (%s, %s)" % (hersteller_title, hersteller_desc)
     #    cur.execute(insert)
     #    cur.fetchall()
