@@ -113,7 +113,12 @@ def getProduktdatenblatt():
            'sort_on': 'sortable_title',
            'metadata_fields':'UID'}
     entries = getCatalogData(payload)
-    return entries
+    newentries = list()
+    for i in entries:
+        data = getItemData(i)
+        newentries.append(data)
+        #import pdb; pdb.set_trace()
+    return newentries
 
 def getHeatset():
     payload = {'portal_type': 'nva.chemiedp.heatsetwaschmittel',
@@ -244,11 +249,20 @@ if __name__ == "__main__":
         datenblatt_desc = i.get('description')
         datenblatt_uid = i.get('UID')
         datenblatt_link = i.get('@id')
+        datenblatt_skin_category = i.get('hskategorie')
+        datenblatt_checked_emissions = i.get('emissionsgeprueft')
+        datenblatt_product_category = i.get('produktkategorie')
+        datenblatt_product_class = i.get('produktklasse')
+        datenblatt_flashpoint = i.get('flammpunkt')
+        datenblatt_values_range = i.get('wertebereich')
+        datenblatt_material_compatibility = i.get('materialvertraeglichkeit')
+        datenblatt_comments = i.get('bemerkungen')
+
         cur = conn.cursor()
         # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
         cur.execute(
-            "INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url) VALUES (%s, %s, %s, 'product_datasheet', NULL);",
-            (datenblatt_title, datenblatt_desc, datenblatt_uid))
+            "INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url, skin_category, checked_emissions, product_category, product_class, flashpoint, values_range, material_compatibility, comments) VALUES (%s, %s, %s, 'product_datasheet', NULL, %s, %s, %s, %s, %s, %s, %s, %s);",
+            (datenblatt_title, datenblatt_desc, datenblatt_uid, datenblatt_skin_category, datenblatt_checked_emissions, datenblatt_product_category, datenblatt_product_class, datenblatt_flashpoint, datenblatt_values_range, datenblatt_material_compatibility, datenblatt_comments))
         conn.commit()
         #print(datenblatt_title)  # correct
         cur.close()
