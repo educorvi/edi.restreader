@@ -51,9 +51,9 @@ def getHersteller():
     for i in entries:
         data = getItemData(i)
         newentries.append(data)
-        #import pdb;pdb.set_trace()
+        print("Fetched MANUFACTURER: "+i.get('title'))
     return newentries
-    return entries
+
 
 def getMachines():
     payload = {'portal_type': 'nva.chemiedp.maschine',
@@ -65,7 +65,7 @@ def getMachines():
     for i in entries:
         data = getItemData(i)
         newentries.append(data)
-        #import pdb; pdb.set_trace()
+        print("Fetched MACHINE: "+i.get('title'))
     return newentries
 
 def getPowders():
@@ -78,7 +78,7 @@ def getPowders():
     for i in entries:
         data = getItemData(i)
         newentries.append(data)
-        #import pdb; pdb.set_trace()
+        print("Fetched POWDER: "+i.get('title'))
     return newentries
 
 def getEtiketten():
@@ -91,7 +91,7 @@ def getEtiketten():
     for i in entries:
         data = getItemData(i)
         newentries.append(data)
-        #import pdb; pdb.set_trace()
+        print("Fetched DETERGENT_LABEL: "+i.get('title'))
     return newentries
 
 def getManuell():
@@ -104,7 +104,7 @@ def getManuell():
     for i in entries:
         data = getItemData(i)
         newentries.append(data)
-        #import pdb; pdb.set_trace()
+        print("Fetched DETERGENT_MANUAL: "+i.get('title'))
     return newentries
 
 def getProduktdatenblatt():
@@ -117,7 +117,7 @@ def getProduktdatenblatt():
     for i in entries:
         data = getItemData(i)
         newentries.append(data)
-        #import pdb; pdb.set_trace()
+        print("Fetched PRODUCT_DATASHEET: "+i.get('title'))
     return newentries
 
 def getHeatset():
@@ -126,9 +126,16 @@ def getHeatset():
            'sort_on': 'sortable_title',
            'metadata_fields':'UID'}
     entries = getCatalogData(payload)
-    return entries
+    newentries = list()
+    for i in entries:
+        data = getItemData(i)
+        newentries.append(data)
+        print("Fetched DETERGENT_HEATSET: "+i.get('title'))
+    return newentries
 
 if __name__ == "__main__":
+
+    print("Starting data migration...")
     hostname = 'localhost'
     username = 'postgres'
     database = 'gefahrstoff'
@@ -162,7 +169,7 @@ if __name__ == "__main__":
         #print(hersteller_title)# correct
         cur.close()
 
-    print('Hersteller erfolgreich migriert')
+    print('Successfully migrated MANUFACTURER')
 
     for i in erg2:
         machine_title = i.get('title')
@@ -177,7 +184,7 @@ if __name__ == "__main__":
         # print(machine_title)  # correct
         cur.close()
 
-    print('Druckmaschinen erfolgreich migriert')
+    print('Successfully migrated PRINTING_MACHINE')
 
     for i in erg3:
         powder_title = i.get('title')
@@ -191,15 +198,19 @@ if __name__ == "__main__":
         powder_machinery = i.get('maschinen')
         powder_checked_emissions = i.get('emissionsgeprueft')
         powder_date_checked = i.get('pruefdateum')
+        powder_manufacturer_name = i.get('hersteller')['title']
+
         cur = conn.cursor()
-        # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
-        cur.execute("INSERT INTO spray_powder (title, description, webcode, image_url, product_class, starting_material, median_value, volume_share, machinery, checked_emissions, date_checked) VALUES (%s, %s, %s, NULL, %s, %s, %s, %s, %s, %s, %s);",
-                    (powder_title, powder_desc, powder_uid, powder_product_class, powder_starting_material, powder_median_value, powder_volume_share, powder_machinery, powder_checked_emissions, powder_date_checked))
+        cur.execute("SELECT manufacturer_id FROM manufacturer WHERE title = '{0}';".format(powder_manufacturer_name))
+        powder_manufacturer_id = cur.fetchall()
+        cur.close()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO spray_powder (title, description, webcode, manufacturer_id, image_url, product_class, starting_material, median_value, volume_share, machinery, checked_emissions, date_checked) VALUES (%s, %s, %s, %s, NULL, %s, %s, %s, %s, %s, %s, %s);",
+                    (powder_title, powder_desc, powder_uid, powder_manufacturer_id[0], powder_product_class, powder_starting_material, powder_median_value, powder_volume_share, powder_machinery, powder_checked_emissions, powder_date_checked))
         conn.commit()
-        #print(powder_title)  # correct
         cur.close()
 
-    print('Druckbestäubungspuder erfolgreich migriert')
+    print('Successfully migrated SPRAY_POWDER')
 
     for i in erg4:
         etikett_title = i.get('title')
@@ -220,7 +231,7 @@ if __name__ == "__main__":
         #print(etikett_title)  # correct
         cur.close()
 
-    print('Reinigungsmittel für Etiketten erfolgreich migriert')
+    print('Successfully migrated DETERGENT_LABELS')
         
     for i in erg5:
         manuell_title = i.get('title')
@@ -242,7 +253,7 @@ if __name__ == "__main__":
         #print(manuell_title)  # correct
         cur.close()
 
-    print('Reinigungsmittel Manuell erfolgreich migriert')
+    print('Successfully migrated DETERGENT_MANUAL')
 
     for i in erg6:
         datenblatt_title = i.get('title')
@@ -268,23 +279,31 @@ if __name__ == "__main__":
         #print(datenblatt_title)  # correct
         cur.close()
 
-    print('Produktdatenblätter erfolgreich migriert')
+    print('Successfully migrated PRODUCT_DATASHEET')
 
     for i in erg7:
         heatset_title = i.get('title')
         heatset_desc = i.get('description')
         heatset_uid = i.get('UID')
         heatset_link = i.get('@id')
+        heatset_ueg = i.get('ueg')
+        heatset_response = i.get('response')
+        heatset_skin_category = i.get('hskategorie')
+        heatset_date_checked = i.get('pruefdateum')
+        heatset_checked_emissions = i.get('emissionsgeprueft')
+
         cur = conn.cursor()
+        #import pdb; pdb.set_trace()
         # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
         cur.execute(
-            "INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url) VALUES (%s, %s, %s, 'detergent_heatset', NULL);",
-            (heatset_title, heatset_desc, heatset_uid))
+            "INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url, ueg, response, skin_category, date_checked, checked_emissions) VALUES (%s, %s, %s, 'detergent_heatset', NULL, %s, %s, %s, %s, %s);",
+            (heatset_title, heatset_desc, heatset_uid, heatset_ueg, heatset_response, heatset_skin_category, heatset_date_checked, heatset_checked_emissions))
         conn.commit()
         #print(heatset_title)  # correct
         cur.close()
 
-    print('Heatsetwaschmittel erfolgreich migriert')
+    print('Successfully migrated DETERGENT_HEATSET')
+    print('CHEERS! DATA MIGRATION SUCCESSFULLY COMPLETED :)')
 
     #    insert = "INSERT INTO manufacturer(title, description) (%s, %s)" % (hersteller_title, hersteller_desc)
     #    cur.execute(insert)
