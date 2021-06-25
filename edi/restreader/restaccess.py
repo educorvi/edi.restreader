@@ -91,6 +91,7 @@ def getEtiketten():
     for i in entries:
         data = getItemData(i)
         newentries.append(data)
+        #import pdb; pdb.set_trace()
         print("Fetched DETERGENT_LABEL: "+i.get('title'))
     return newentries
 
@@ -199,6 +200,11 @@ if __name__ == "__main__":
         powder_checked_emissions = i.get('emissionsgeprueft')
         powder_date_checked = i.get('pruefdateum')
         powder_manufacturer_name = i.get('hersteller')['title']
+
+        powder_successfulluid = False
+        while powder_successfulluid == False:
+            """"""
+
 
         cur = conn.cursor()
         cur.execute("SELECT manufacturer_id FROM manufacturer WHERE title = '{0}';".format(powder_manufacturer_name))
