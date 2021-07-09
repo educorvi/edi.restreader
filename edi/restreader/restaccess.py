@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import requests
 import psycopg2
+import random
+import datetime
 import json
 from time import time
 
@@ -177,10 +179,18 @@ if __name__ == "__main__":
         machine_desc = i.get('description')
         machine_uid = i.get('UID')
         machine_link = i.get('@id')
+        machine_manufacturer_name = i.get('hersteller')['title']
+        #import pdb; pdb.set_trace()
+
+        cur = conn.cursor()
+        cur.execute("SELECT manufacturer_id FROM manufacturer WHERE title = '{0}';".format(machine_manufacturer_name))
+        machine_manufacturer_id = cur.fetchall()
+        cur.close()
+
         cur = conn.cursor()
         # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
-        cur.execute("INSERT INTO printing_machine (title, description, webcode, image_url) VALUES (%s, %s, %s, NULL);",
-                    (machine_title, machine_desc, machine_uid))
+        cur.execute("INSERT INTO printing_machine (title, description, webcode, image_url, manufacturer_id) VALUES (%s, %s, %s, NULL, %s);",
+                    (machine_title, machine_desc, machine_uid, machine_manufacturer_id[0]))
         conn.commit()
         # print(machine_title)  # correct
         cur.close()
@@ -201,18 +211,31 @@ if __name__ == "__main__":
         powder_date_checked = i.get('pruefdateum')
         powder_manufacturer_name = i.get('hersteller')['title']
 
-        powder_successfulluid = False
-        while powder_successfulluid == False:
-            """"""
+        successfuluid = False
+        while successfuluid == False:
+            random_number = str(random.randint(100000, 999999))
 
+            fullyear = datetime.datetime.now().year
+            shortyear = str(fullyear)[2:]
+
+            generated_uid = "PD" + shortyear + random_number
+
+            cur = conn.cursor()
+            cur.execute("SELECT spray_powder_id FROM spray_powder WHERE title = '{0}';".format(generated_uid))
+            useduid = cur.fetchall()
+            cur.close()
+
+            if useduid == []:
+                successfuluid = True
 
         cur = conn.cursor()
         cur.execute("SELECT manufacturer_id FROM manufacturer WHERE title = '{0}';".format(powder_manufacturer_name))
         powder_manufacturer_id = cur.fetchall()
         cur.close()
+
         cur = conn.cursor()
         cur.execute("INSERT INTO spray_powder (title, description, webcode, manufacturer_id, image_url, product_class, starting_material, median_value, volume_share, machinery, checked_emissions, date_checked) VALUES (%s, %s, %s, %s, NULL, %s, %s, %s, %s, %s, %s, %s);",
-                    (powder_title, powder_desc, powder_uid, powder_manufacturer_id[0], powder_product_class, powder_starting_material, powder_median_value, powder_volume_share, powder_machinery, powder_checked_emissions, powder_date_checked))
+                    (powder_title, powder_desc, generated_uid, powder_manufacturer_id[0], powder_product_class, powder_starting_material, powder_median_value, powder_volume_share, powder_machinery, powder_checked_emissions, powder_date_checked))
         conn.commit()
         cur.close()
 
@@ -229,10 +252,17 @@ if __name__ == "__main__":
         etikett_values_range = i.get('wertebereich')
         etikett_classifications = i.get('einstufungen')
         etikett_usecases = i.get('verwendungszweck')
+        etikett_manufacturer_name = i.get('hersteller')['title']
+
+        cur = conn.cursor()
+        cur.execute("SELECT manufacturer_id FROM manufacturer WHERE title = '{0}';".format(etikett_manufacturer_name))
+        etikett_manufacturer_id = cur.fetchall()
+        cur.close()
+
         cur = conn.cursor()
         # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
-        cur.execute("INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url, skin_category, checked_emissions, flashpoint, values_range, classifications, usecases) VALUES (%s, %s, %s, 'detergent_labels', NULL, %s, %s, %s, %s, %s, %s);",
-                    (etikett_title, etikett_desc, etikett_uid, etikett_skin_category, etikett_checked_emissions, etikett_flashpoint, etikett_values_range, etikett_classifications, etikett_usecases))
+        cur.execute("INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url, skin_category, checked_emissions, flashpoint, values_range, classifications, usecases, manufacturer_id) VALUES (%s, %s, %s, 'detergent_labels', NULL, %s, %s, %s, %s, %s, %s, %s);",
+                    (etikett_title, etikett_desc, etikett_uid, etikett_skin_category, etikett_checked_emissions, etikett_flashpoint, etikett_values_range, etikett_classifications, etikett_usecases, etikett_manufacturer_id[0]))
         conn.commit()
         #print(etikett_title)  # correct
         cur.close()
