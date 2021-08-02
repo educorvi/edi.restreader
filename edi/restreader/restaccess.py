@@ -280,11 +280,17 @@ if __name__ == "__main__":
         manuell_values_range = i.get('wertebereich')
         manuell_usecases = i.get('verwendungszweck')
         manuell_application_areas = i.get('anwendungsgebiete')
+        manuell_manufacturer_name = i.get('hersteller')['title']
+
+        cur = conn.cursor()
+        cur.execute("SELECT manufacturer_id FROM manufacturer WHERE title = '{0}';".format(manuell_manufacturer_name))
+        manuell_manufacturer_id = cur.fetchall()
+        cur.close()
 
         cur = conn.cursor()
         # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
-        cur.execute("INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url, skin_category, checked_emissions, flashpoint, values_range, usecases, application_areas) VALUES (%s, %s, %s, 'detergent_manual', NULL, %s, %s, %s, %s, %s, %s);",
-                    (manuell_title, manuell_desc, manuell_uid, manuell_skin_category, manuell_checked_emissions, manuell_flashpoint, manuell_values_range, manuell_usecases, manuell_application_areas))
+        cur.execute("INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url, skin_category, checked_emissions, flashpoint, values_range, usecases, application_areas, manufactuer_id) VALUES (%s, %s, %s, 'detergent_manual', NULL, %s, %s, %s, %s, %s, %s, %s);",
+                    (manuell_title, manuell_desc, manuell_uid, manuell_skin_category, manuell_checked_emissions, manuell_flashpoint, manuell_values_range, manuell_usecases, manuell_application_areas, manuell_manufacturer_id))
         conn.commit()
         #print(manuell_title)  # correct
         cur.close()
