@@ -231,8 +231,8 @@ if __name__ == "__main__":
         cur.close()
 
         cur = conn.cursor()
-        cur.execute("INSERT INTO spray_powder (title, description, webcode, manufacturer_id, image_url, product_class, starting_material, median_value, volume_share, machinery, checked_emissions, date_checked) VALUES (%s, %s, %s, %s, NULL, %s, %s, %s, %s, %s, %s, %s);",
-                    (powder_title, powder_desc, generated_uid, powder_manufacturer_id[0], powder_product_class, powder_starting_material, powder_median_value, powder_volume_share, powder_machinery, powder_checked_emissions, powder_date_checked))
+        cur.execute("INSERT INTO spray_powder (title, description, webcode, manufacturer_id, image_url, product_class, starting_material, median_value, volume_share, checked_emissions, date_checked) VALUES (%s, %s, %s, %s, NULL, %s, %s, %s, %s, %s, %s);",
+                    (powder_title, powder_desc, generated_uid, powder_manufacturer_id[0], powder_product_class, powder_starting_material, powder_median_value, powder_volume_share, powder_checked_emissions, powder_date_checked))
         conn.commit()
         cur.close()
 
