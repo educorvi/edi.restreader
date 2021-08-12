@@ -335,6 +335,11 @@ if __name__ == "__main__":
         heatset_date_checked = i.get('pruefdateum')
         heatset_checked_emissions = i.get('emissionsgeprueft')
 
+        if heatset_skin_category:
+            pass
+        else:
+            heatset_skin_category = ''
+
         cur = conn.cursor()
         #import pdb; pdb.set_trace()
         # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
