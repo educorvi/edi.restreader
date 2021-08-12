@@ -56,7 +56,7 @@ def getHersteller():
         print("Fetched MANUFACTURER: "+i.get('title'))
     return newentries
 
-
+"""
 def getMachines():
     payload = {'portal_type': 'nva.chemiedp.maschine',
            'b_size': 500,
@@ -69,6 +69,8 @@ def getMachines():
         newentries.append(data)
         print("Fetched MACHINE: "+i.get('title'))
     return newentries
+    
+"""
 
 def getPowders():
     payload = {'portal_type': 'nva.chemiedp.druckbestaeubungspuder',
@@ -145,7 +147,7 @@ if __name__ == "__main__":
     database = 'gefahrstoffdb'
 
     erg = getHersteller()
-    erg2 = getMachines()
+    #erg2 = getMachines()
     erg3 = getPowders()
     erg4 = getEtiketten()
     erg5 = getManuell()
@@ -157,24 +159,17 @@ if __name__ == "__main__":
         hersteller_title = i.get('title')
         hersteller_desc = i.get('description')
         hersteller_uid = i.get('UID')
-        hersteller_link = i.get('@id')
-        hersteller_address1 = i.get('anschrift1')
-        hersteller_address2 = i.get('anschrift2')
-        hersteller_address3 = i.get('anschrift3')
-        hersteller_country = i.get('land')
-        hersteller_phone = i.get('telefon')
-        hersteller_fax = i.get('telefax')
-        hersteller_email = i.get('email')
         hersteller_homepage = i.get('homepage')
         cur = conn.cursor()
         #cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
-        cur.execute("INSERT INTO manufacturer (title, description, webcode, image_id, address1, address2, address3, country, phone, fax, email, homepage) VALUES (%s, %s, %s, NULL, %s, %s, %s, %s, %s, %s, %s, %s);", (hersteller_title, hersteller_desc, hersteller_uid, hersteller_address1, hersteller_address2, hersteller_address3, hersteller_country, hersteller_phone, hersteller_fax, hersteller_email, hersteller_homepage))
+        cur.execute("INSERT INTO manufacturer (title, description, webcode, homepage) VALUES (%s, %s, %s, %s);", (hersteller_title, hersteller_desc, hersteller_uid, hersteller_homepage))
         conn.commit()
         #print(hersteller_title)# correct
         cur.close()
 
     print('Successfully migrated MANUFACTURER')
 
+    """
     for i in erg2:
         machine_title = i.get('title')
         machine_desc = i.get('description')
@@ -198,6 +193,8 @@ if __name__ == "__main__":
 
     print('Successfully migrated PRINTING_MACHINE')
 
+    """
+
     for i in erg3:
         powder_title = i.get('title')
         powder_desc = i.get('description')
@@ -207,7 +204,6 @@ if __name__ == "__main__":
         powder_starting_material = i.get('ausgangsmaterial')
         powder_median_value = i.get('medianwert')
         powder_volume_share = i.get('volumenanteil')
-        powder_machinery = i.get('maschinen')
         powder_checked_emissions = i.get('emissionsgeprueft')
         powder_date_checked = i.get('pruefdateum')
         powder_manufacturer_name = i.get('hersteller')['title']
@@ -246,7 +242,6 @@ if __name__ == "__main__":
         etikett_title = i.get('title')
         etikett_desc = i.get('description')
         etikett_uid = i.get('UID')
-        etikett_link = i.get('@id')
         etikett_skin_category = i.get('hskategorie')
         etikett_checked_emissions = i.get('emissionsgeprueft')
         etikett_flashpoint = i.get('flammpunkt')
@@ -262,8 +257,8 @@ if __name__ == "__main__":
 
         cur = conn.cursor()
         # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
-        cur.execute("INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url, skin_category, checked_emissions, flashpoint, values_range, classifications, usecases, manufacturer_id) VALUES (%s, %s, %s, 'detergent_labels', NULL, %s, %s, %s, %s, %s, %s, %s);",
-                    (etikett_title, etikett_desc, etikett_uid, etikett_skin_category, etikett_checked_emissions, etikett_flashpoint, etikett_values_range, etikett_classifications, etikett_usecases, etikett_manufacturer_id[0]))
+        cur.execute("INSERT INTO substance_mixture (title, description, webcode, branch, substance_type, image_url, skin_category, checked_emissions, flashpoint, values_range, usecases, manufacturer_id) VALUES (%s, %s, %s, 'branch', 'detergent_labels', NULL, %s, %s, %s, %s, %s, %s);",
+                    (etikett_title, etikett_desc, etikett_uid, etikett_skin_category, etikett_checked_emissions, etikett_flashpoint, etikett_values_range, etikett_usecases, etikett_manufacturer_id[0]))
         conn.commit()
         #print(etikett_title)  # correct
         cur.close()
@@ -290,7 +285,7 @@ if __name__ == "__main__":
 
         cur = conn.cursor()
         # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
-        cur.execute("INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url, skin_category, checked_emissions, flashpoint, values_range, usecases, application_areas, manufacturer_id) VALUES (%s, %s, %s, 'detergent_manual', NULL, %s, %s, %s, %s, %s, %s, %s);",
+        cur.execute("INSERT INTO substance_mixture (title, description, webcode, branch, substance_type, image_url, skin_category, checked_emissions, flashpoint, values_range, usecases, application_areas, manufacturer_id) VALUES (%s, %s, %s, 'branch', 'detergent_manual', NULL, %s, %s, %s, %s, %s, %s, %s);",
                     (manuell_title, manuell_desc, manuell_uid, manuell_skin_category, manuell_checked_emissions, manuell_flashpoint, manuell_values_range, manuell_usecases, manuell_application_areas, manuell_manufacturer_id[0]))
         conn.commit()
         #print(manuell_title)  # correct
@@ -316,8 +311,8 @@ if __name__ == "__main__":
         cur = conn.cursor()
         # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
         cur.execute(
-            "INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url, skin_category, checked_emissions, product_category, product_class, flashpoint, values_range, material_compatibility, comments) VALUES (%s, %s, %s, 'product_datasheet', NULL, %s, %s, %s, %s, %s, %s, %s, %s);",
-            (datenblatt_title, datenblatt_desc, datenblatt_uid, datenblatt_skin_category, datenblatt_checked_emissions, datenblatt_product_category, datenblatt_product_class, datenblatt_flashpoint, datenblatt_values_range, datenblatt_material_compatibility, str(datenblatt_comments)))
+            "INSERT INTO substance_mixture (title, description, webcode, branch, substance_type, image_url, skin_category, checked_emissions, flashpoint, values_range, comments) VALUES (%s, %s, %s, 'branch', ''product_datasheet', NULL, %s, %s, %s, %s, %s);",
+            (datenblatt_title, datenblatt_desc, datenblatt_uid, datenblatt_skin_category, datenblatt_checked_emissions, datenblatt_flashpoint, datenblatt_values_range, str(datenblatt_comments)))
         conn.commit()
         #print(datenblatt_title)  # correct
         cur.close()
@@ -339,7 +334,7 @@ if __name__ == "__main__":
         #import pdb; pdb.set_trace()
         # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
         cur.execute(
-            "INSERT INTO substance_mixture (title, description, webcode, substance_type, image_url, ueg, response, skin_category, date_checked, checked_emissions) VALUES (%s, %s, %s, 'detergent_heatset', NULL, %s, %s, %s, %s, %s);",
+            "INSERT INTO substance_mixture (title, description, webcode, branch, substance_type, image_url, ueg, response, skin_category, date_checked, checked_emissions) VALUES (%s, %s, %s, 'branch', 'detergent_heatset', NULL, %s, %s, %s, %s, %s);",
             (heatset_title, heatset_desc, heatset_uid, heatset_ueg, heatset_response, heatset_skin_category, heatset_date_checked, heatset_checked_emissions))
         conn.commit()
         #print(heatset_title)  # correct
