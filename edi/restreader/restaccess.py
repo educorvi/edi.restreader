@@ -257,7 +257,7 @@ if __name__ == "__main__":
 
         cur = conn.cursor()
         # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
-        cur.execute("INSERT INTO substance_mixture (title, description, webcode, branch, substance_type, image_url, skin_category, checked_emissions, flashpoint, values_range, usecases, manufacturer_id) VALUES (%s, %s, %s, '{"branch", 0}', 'detergent_labels', NULL, %s, %s, %s, %s, %s, %s);",
+        cur.execute("INSERT INTO substance_mixture (title, description, webcode, branch, substance_type, image_url, skin_category, checked_emissions, flashpoint, values_range, usecases, manufacturer_id) VALUES (%s, %s, %s, ARRAY['branch', 'branch'], 'detergent_labels', NULL, %s, %s, %s, %s, %s, %s);",
                     (etikett_title, etikett_desc, etikett_uid, etikett_skin_category, etikett_checked_emissions, etikett_flashpoint, etikett_values_range, etikett_usecases, etikett_manufacturer_id[0]))
         conn.commit()
         #print(etikett_title)  # correct
@@ -316,7 +316,7 @@ if __name__ == "__main__":
         cur = conn.cursor()
         # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
         cur.execute(
-            "INSERT INTO substance_mixture (title, description, webcode, branch, substance_type, image_url, skin_category, checked_emissions, flashpoint, values_range, comments) VALUES (%s, %s, %s, '{"branch", 0}', 'product_datasheet', NULL, %s, %s, %s, %s, %s);",
+            "INSERT INTO substance_mixture (title, description, webcode, branch, substance_type, image_url, skin_category, checked_emissions, flashpoint, values_range, comments) VALUES (%s, %s, %s, ARRAY['branch', 'branch'], 'product_datasheet', NULL, %s, %s, %s, %s, %s);",
             (datenblatt_title, datenblatt_desc, datenblatt_uid, datenblatt_skin_category, datenblatt_checked_emissions, datenblatt_flashpoint, datenblatt_values_range, str(datenblatt_comments)))
         conn.commit()
         #print(datenblatt_title)  # correct
@@ -344,7 +344,7 @@ if __name__ == "__main__":
         #import pdb; pdb.set_trace()
         # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
         cur.execute(
-            "INSERT INTO substance_mixture (title, description, webcode, branch, substance_type, image_url, ueg, response, skin_category, date_checked, checked_emissions) VALUES (%s, %s, %s, '{"branch", 0}', 'detergent_heatset', NULL, %s, %s, %s, %s, %s);",
+            "INSERT INTO substance_mixture (title, description, webcode, branch, substance_type, image_url, ueg, response, skin_category, date_checked, checked_emissions) VALUES (%s, %s, %s, ARRAY['branch', 'branch'], 'detergent_heatset', NULL, %s, %s, %s, %s, %s);",
             (heatset_title, heatset_desc, heatset_uid, heatset_ueg, heatset_response, heatset_skin_category, heatset_date_checked, heatset_checked_emissions))
         conn.commit()
         #print(heatset_title)  # correct
