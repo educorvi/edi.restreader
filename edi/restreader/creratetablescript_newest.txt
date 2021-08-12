@@ -1,0 +1,87 @@
+CREATE TABLE image_url (
+image_url_id serial NOT NULL,
+title varchar(1000) NOT NULL,
+description varchar(1000),
+webcode varchar(1000) NOT NULL,
+image_url varchar(1000) NOT NULL,
+PRIMARY KEY(image_url_id));
+
+CREATE TABLE manufacturer (
+manufacturer_id serial NOT NULL,
+title varchar(1000) NOT NULL,
+description varchar(1000),
+webcode varchar(1000) NOT NULL,
+homepage varchar(1000),
+PRIMARY KEY(manufacturer_id));
+
+CREATE TABLE substance (
+substance_id serial NOT NULL,
+title varchar(1000) NOT NULL,
+description varchar(1000),
+webcode varchar(1000) NOT NULL,
+casnr integer NOT NULL,
+concentration integer,
+skin_category varchar(1000) NOT NULL,
+branch text,
+image_id integer references image_url(image_url_id) ON DELETE SET NULL,
+PRIMARY KEY(substance_id));
+
+CREATE TABLE substance_mixture (
+substance_mixture_id serial NOT NULL,
+title varchar(1000) NOT NULL,
+description varchar(1000),
+webcode varchar(1000) NOT NULL,
+branch text NOT NULL,
+substance_type text NOT NULL,
+offset_print_manner varchar(1000),
+detergent_special bool,
+application_areas varchar(1000),
+usecases text[],
+evaporation_lane_150 float8,
+evaporation_lane_160 float8,
+evaporation_lane_170 float8,
+evaporation_lane_180 float8,
+ueg varchar(1000),
+response varchar(1000),
+skin_category varchar(1000) NOT NULL,
+checked_emissions bool,
+date_checked date,
+flashpoint integer,
+values_range bool,
+comments varchar(1000),
+image_url integer references image_url(image_url_id) ON DELETE SET NULL,
+manufacturer_id integer references manufacturer(manufacturer_id) ON DELETE CASCADE,
+PRIMARY KEY(substance_mixture_id));
+
+CREATE TABLE spray_powder (
+spray_powder_id serial NOT NULL,
+title varchar(1000) NOT NULL,
+description varchar(1000),
+webcode varchar(1000) NOT NULL,
+product_class varchar(1000),
+starting_material varchar(1000),
+median_value float8,
+volume_share float8,
+checked_emissions bool,
+date_checked date,
+image_url integer references image_url(image_url_id) ON DELETE SET NULL,
+manufacturer_id integer references manufacturer(manufacturer_id) ON DELETE CASCADE,
+PRIMARY KEY(spray_powder_id));
+
+CREATE TABLE ingredients(
+ingredient_id serial NOT NULL,
+title varchar(1000) NOT NULL,
+description varchar(1000),
+casnr integer,
+concentration integer,
+skin_category varchar(1000),
+branch text,
+PRIMARY KEY (ingredient_id));
+
+CREATE TABLE recipes(
+recipe_id serial NOT NULL,
+substance_id integer references substance(substance_id) ON DELETE CASCADE,
+ingredient_id integer references ingredients(ingredient_id) ON DELETE CASCADE,
+mixture_id integer NOT NULL references substance_mixture(substance_mixture_id) ON DELETE CASCADE,
+concentration integer NOT NULL,
+PRIMARY KEY (recipe_id));
