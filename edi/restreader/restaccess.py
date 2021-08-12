@@ -307,6 +307,11 @@ if __name__ == "__main__":
         datenblatt_material_compatibility = i.get('materialvertraeglichkeit')
         datenblatt_comments = i.get('bemerkungen')
 
+        if datenblatt_skin_category:
+            pass
+        else:
+            datenblatt_skin_category = ''
+
         #import pdb; pdb.set_trace()
         cur = conn.cursor()
         # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
