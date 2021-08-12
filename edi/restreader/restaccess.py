@@ -311,7 +311,7 @@ if __name__ == "__main__":
         cur = conn.cursor()
         # cur.execute("INSERT INTO manufacturer (title, description, webcode) VALUES (%s, %s, %s)") % (hersteller_title, hersteller_desc, hersteller_uid)
         cur.execute(
-            "INSERT INTO substance_mixture (title, description, webcode, branch, substance_type, image_url, skin_category, checked_emissions, flashpoint, values_range, comments) VALUES (%s, %s, %s, 'branch', ''product_datasheet', NULL, %s, %s, %s, %s, %s);",
+            "INSERT INTO substance_mixture (title, description, webcode, branch, substance_type, image_url, skin_category, checked_emissions, flashpoint, values_range, comments) VALUES (%s, %s, %s, 'branch', 'product_datasheet', NULL, %s, %s, %s, %s, %s);",
             (datenblatt_title, datenblatt_desc, datenblatt_uid, datenblatt_skin_category, datenblatt_checked_emissions, datenblatt_flashpoint, datenblatt_values_range, str(datenblatt_comments)))
         conn.commit()
         #print(datenblatt_title)  # correct
