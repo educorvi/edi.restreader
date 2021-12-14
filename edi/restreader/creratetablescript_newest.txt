@@ -4,7 +4,7 @@ title varchar(1000) NOT NULL,
 description varchar(1000),
 webcode varchar(1000) NOT NULL,
 homepage varchar(1000),
-published bool,
+status varchar(1000),
 PRIMARY KEY(manufacturer_id));
 
 CREATE TABLE substance (
@@ -21,7 +21,7 @@ dnel_lokal varchar(1000),
 dnel_systemisch varchar(1000),
 comments varchar(1000),
 link varchar(1000),
-published bool,
+status varchar(1000)
 PRIMARY KEY(substance_id));
 
 CREATE TABLE synonyms(
@@ -35,8 +35,8 @@ substance_mixture_id serial NOT NULL,
 title varchar(1000) NOT NULL,
 description varchar(1000),
 webcode varchar(1000) NOT NULL,
-branch text NOT NULL,
-substance_type text NOT NULL,
+branch varchar(1000) NOT NULL,
+substance_type varchar(1000) NOT NULL,
 offset_print_manner varchar(1000),
 detergent_special bool,
 application_areas varchar(1000),
@@ -55,7 +55,7 @@ values_range bool,
 comments varchar(1000),
 image_url varchar(1000),
 manufacturer_id integer references manufacturer(manufacturer_id) ON DELETE CASCADE,
-published bool,
+status varchar(1000),
 PRIMARY KEY(substance_mixture_id));
 
 CREATE TABLE spray_powder (
@@ -71,26 +71,14 @@ checked_emissions bool,
 date_checked date,
 image_url varchar(1000),
 manufacturer_id integer references manufacturer(manufacturer_id) ON DELETE CASCADE,
-published bool,
+status varchar(1000),
 PRIMARY KEY(spray_powder_id));
-
-CREATE TABLE ingredients(
-ingredient_id serial NOT NULL,
-title varchar(1000) NOT NULL,
-description varchar(1000),
-casnr integer,
-concentration integer,
-skin_category varchar(1000),
-branch text,
-published bool,
-PRIMARY KEY (ingredient_id));
 
 CREATE TABLE recipes(
 recipe_id serial NOT NULL,
 substance_id integer references substance(substance_id) ON DELETE CASCADE,
-ingredient_id integer references ingredients(ingredient_id) ON DELETE CASCADE,
 mixture_id integer NOT NULL references substance_mixture(substance_mixture_id) ON DELETE CASCADE,
 concentration_min float8,
 concentration_max float8,
-published bool,
+status varchar(1000),
 PRIMARY KEY (recipe_id));
