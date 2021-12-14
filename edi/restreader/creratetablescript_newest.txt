@@ -21,7 +21,7 @@ dnel_lokal varchar(1000),
 dnel_systemisch varchar(1000),
 comments varchar(1000),
 link varchar(1000),
-status varchar(1000)
+status varchar(1000),
 PRIMARY KEY(substance_id));
 
 CREATE TABLE synonyms(
