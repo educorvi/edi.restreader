@@ -84,3 +84,25 @@ concentration_min float8,
 concentration_max float8,
 status varchar(1000),
 PRIMARY KEY (recipe_id));
+
+CREATE TABLE application_areas(
+application_area_id serial NOT NULL,
+application_area_name varchar(1000),
+PRIMARY KEY (application_area_id));
+
+CREATE TABLE usecases(
+usecase_id serial NOT NULL,
+usecase_name varchar(1000),
+PRIMARY KEY (usecase_id));
+
+CREATE TABLE areapairs(
+areapair_id serial NOT NULL,
+area_id integer NOT NULL references application_areas(application_area_id) ON DELETE CASCADE,
+mixture_id integer NOT NULL references substance_mixture(substance_mixture_id) ON DELETE CASCADE,
+PRIMARY KEY (areapair_id));
+
+CREATE TABLE usecasepairs(
+usecasepair_id serial NOT NULL,
+usecase_id integer NOT NULL references usecases(usecase_id) ON DELETE CASCADE,
+mixture_id integer NOT NULL references substance_mixture(substance_mixture_id) ON DELETE CASCADE,
+PRIMARY KEY (usecasepair_id));
