@@ -12,8 +12,11 @@ from time import time
 from plone import api as ploneapi
 
 login = {'login': 'restaccess', 'password': 'H9jCg768'}
-authurl = u'http://emissionsarme-produkte.bgetem.de/@login'
-searchurl = u'http://emissionsarme-produkte.bgetem.de/@search'
+#login = {'login': 'admin', 'password': 'Bg2011eteM'}
+authurl = u'https://emissionsarme-produkte.bgetem.de/@login'
+#authurl = u'http://10.33.202.24:8080/portal/@login'
+searchurl = u'https://emissionsarme-produkte.bgetem.de/@search'
+#searchurl = u'http://10.33.202.24:8080/portal/@search'
 
 def getAuthToken():
     headers = {'Accept': 'application/json'}
@@ -27,6 +30,8 @@ def getCatalogData(query):
         'Authorization': 'Bearer %s' % token,
         }
     results = requests.get(searchurl, headers=headers, params=query)
+    print len(results.json().get('items'))
+    #exampleid: https://emissionsarme-produkte.bgetem.de/datenbank-chemie-dp/produktliste-wasch-und-reinigungsmittel-im-offsetdruck/win-wash-hsac
     return results.json().get('items')
 
 @ram.cache(lambda *args: time() // (60 * 60))
@@ -39,6 +44,7 @@ def possibleGefahrstoffe(context):
            'metadata_fields':'UID'}
     entries = getCatalogData(payload)
     for i in entries:
+        print(i.get('@id'))
         terms.append(SimpleVocabulary.createTerm(i.get('@id'), i.get('UID'), i.get('title')))
     return SimpleVocabulary(terms)
 directlyProvides(possibleGefahrstoffe, IContextSourceBinder)
@@ -51,20 +57,50 @@ def getExternalGefahrstoffe():
     entries = getCatalogData(payload)
     return entries
 
+def getNewAuthToken():
+    headers = {'Accept': 'application/json', 'Content-Type': 'application/json'}
+    dburl = 'https://praevention.uv-kooperation.de/@login'
+    dblogin = {'login': 'admin', 'password': 'Bg2011eteM'}
+    token = requests.post(dburl, headers=headers, json=dblogin, verify=False)
+    print 'Token',token
+    return token.json().get('token')
+
+def getNewGefahrstoffe():
+    token = getNewAuthToken()
+    print(token)
+    headers = {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer %s' % token,
+        }
+    dataurl = 'https://praevention.uv-kooperation.de/emissionsarme-produkte/gefahrstoffliste'
+    results = requests.get(dataurl, headers=headers, verify=False)
+    return results.json()
+
 def externalGefahrstoffList():
     terms = []
-    entries = getExternalGefahrstoffe()
+    #entries = getExternalGefahrstoffe()
+    entries = getNewGefahrstoffe()
+    clearids = []
     for i in entries:
+        testid = i.get('@id').replace('https://', 'http://')
         clearid = i.get('@id').split('/')[-1]
-        #if ploneapi.content.find(portal_type='Schutzhandschuh', Gefahrstoffe=i.get('@id')):
-        terms.append(SimpleVocabulary.createTerm(i.get('@id'), clearid, i.get('title')))
+        if clearid not in clearids:
+            clearids.append(clearid)
+            #if ploneapi.content.find(portal_type='Schutzhandschuh', Gefahrstoffe=i.get('@id')):
+            terms.append(SimpleVocabulary.createTerm(testid, clearid, i.get('title')))
+        else:
+            print(clearid)
     return terms
 
 def getExternalGefahrstoff(url):
+    url = url.replace('http://', 'https://')
+    payload = {'gemischid': url}
+    newurl = 'https://praevention.uv-kooperation.de/emissionsarme-produkte/gefahrstoff'
     token = getAuthToken()
     headers = {
         'Accept': 'application/json',
         'Authorization': 'Bearer %s' % token,
         }
-    result = requests.get(url, headers=headers)
+    result = requests.get(newurl, params=payload, auth=('admin', 'Bg2011eteM'), headers=headers, verify=False)
+    print(result.json())
     return result.json() 
